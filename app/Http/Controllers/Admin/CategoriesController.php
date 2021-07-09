@@ -4,8 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Rules\Filter;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Illuminate\Support\Str;
+use App\Http\Requests\CategoryRequest;
+use Throwable;
 
 class CategoriesController extends Controller
 {
@@ -17,6 +22,7 @@ class CategoriesController extends Controller
     public function index()
     {
         //
+        
         $categories = Category::leftJoin('categories as parents','parents.id','=','categories.parent_id')
         ->select([
             'categories.*',
@@ -24,7 +30,7 @@ class CategoriesController extends Controller
         ])
         ->where('categories.status' , '=', 'active')
         ->orderBy('categories.name','DESC')
-        ->get();
+        ->paginate(10, ['*']);
         return view('admin/categories/index',[
             'categories'=> $categories,
         ]);
@@ -51,14 +57,43 @@ class CategoriesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
-        // dd($request);
+    public function store(CategoryRequest $request)
+    {     
+        $rules = [
+            'name' => ['required',
+                     'min:3', 
+                    'string', 
+                    'max:255',
+                    // function ($attribute, $value, $fail) 
+                    //     {
+                    //         if(stripos($value, 'gad') !== false){
+                    //             $fail("you can't put $value word");
+                    //         }
+                    //     }
+                    new Filter(['larval' , 'php', 'gat'])
+                ],
+            'parent_id'=>['nullable', 'int','exists:categories,id'],
+            'description' => ['nullable', 'min:3', 'string'],
+            'status'=> ['required', 'in:active,draft'],
+            'image'=> ['nullable', 'image', 'dimantion:min-width:300px']
+        ];
+        try{
+            $date = $request->all();
+            $validation =  FacadesValidator::make($date, $rules,[
+                'required.name' => 'Category Name'
+            ]);
+            $msg = $validation->errors()->all();
+            $clean = $validation->validate();
+
+        }catch(Throwable $e){
+            // dd();
+            return redirect()->route('categories.create')->withErrors($validation)->withInput() ;       
+          }
         $name = $request->name; 
         $request->merge([
             'slug' => Str::slug($name),
-            'status' => 'active'
+            'status' => 'active',
+            
         ]);
         $category = new Category($request->all());
         $category->save();
@@ -103,7 +138,7 @@ class CategoriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
         //   
         Category::where('id','=',$id)->update($request->except(['_token', '_method']));

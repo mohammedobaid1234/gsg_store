@@ -1,40 +1,37 @@
+<link rel="stylesheet" href="{{asset('assets/admin/formStyle/main.css')}}">
 <div class="form-group">
     <label for="">Name Of Category</label>
-    <input type="text" name="name" value={{$prevCategories->name}}>
+    <input type="text" class=" form-control @error('name') is-invalid @enderror" name="name" value={{old('name', $prevCategories->name)}}>
+    <p class="invalid-feedback"> @error('name') {{$message}}  
+      @enderror
+    
+    </p>
 </div>
 <div class="form-group">
     <label for="">Description</label>
-    <textarea name="description" id="" cols="60" rows="3">{{$prevCategories->description}}</textarea>
+    <textarea name="description" class=" form-control @error('description') is-invalid @enderror" cols="60" rows="3">{{old('description', $prevCategories->description)}}</textarea>
+    <p class="invalid-feedback"> @error('description') {{$message}}   @enderror
+  </div>
+<div class="form-group">
+  <label for="">Description</label>
+  <img src="{{old('image', $prevCategories->image_path)}}" style="width: 50px; height: 50px">
+   <input type="file" name="image" class="@error('image') is-invalid @enderror" value="{{old('image', $prevCategories->image_path)}}">
+   <p class="invalid-feedback"> @error('image') {{$message}}   @enderror </p>
+
 </div>
 <div class="form-group">
-    <div class="file-upload">
-        <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image</button>
-      
-        <div class="image-upload-wrap">
-          <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
-          <div class="drag-text">
-            <h3>Drag and drop a file or select add Image</h3>
-          </div>
-        </div>
-        <div class="file-upload-content">
-          <img class="file-upload-image" src={{$prevCategories->image_path}} alt="your image" />
-          <div class="image-title-wrap">
-            <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
-          </div>
-        </div>
-      </div>
-</div>
-<div class="form-group">
-    <label for="" class=""  style="margin-right:-30px">Parent ID</label>
-    <select name="parent_id" id="parent_id" class="form-control" style="width: 70%; display:inline-block; margin:0">
-      <option value='null'>No Perent</option>
+    <label for="" class="" >Parent ID</label>
+    <select name="parent_id" class=" form-control @error('parent_id') is-invalid @enderror" id="parent_id" class="form-control" style="display:inline-block; margin:0">
+      <option value=''>No Perent</option>
       @foreach ($categories as $category)
-          <option class="form-group" value={{$category->id}} @if ($category->id == $prevCategories->parent_id)
+          <option class="form-group" value={{$category->id}} @if ($category->id == old('parent_id',$prevCategories->parent_id))
             selected
           @endif>{{$category->name}}</option>
       @endforeach      
     </select>
+    <p class="invalid-feedback"> @error('parent_id') {{$message}}   @enderror
+
 </div>
 <div class="form-group">
-  <button type="submit" class=" btn btn-primary" style="width: 20%; font-size:18px; margin:auto">{{$btn}}</button>
+  <button type="submit" class=" btn btn-primary" style="width: 8%; font-size:18px; margin:auto">{{$btn}}</button>
 </div>

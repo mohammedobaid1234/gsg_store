@@ -28,7 +28,7 @@
     <div class="alert alert-danger">{{session()->get('delete')}}</div>
     @endif
 
-    <table class="table table-striped" style="width: 185%">
+    <table class="table table-striped" >
     <thead>
         <th>#</th>
         <th>Name</th>
@@ -37,6 +37,7 @@
         <th>Parent_ID</th>
         <th>Status</th>
         <th>Created At</th>
+        <th>Operation</th>
     </thead>
         @foreach ($categories as $category)
             <tr>
@@ -61,4 +62,5 @@
         @endforeach
    
 </table>
+{{$categories->links()}}
 @endsection

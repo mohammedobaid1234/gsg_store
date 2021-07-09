@@ -6,7 +6,7 @@
 @section('title','Create Page')
     
 @section('content')
-    <form action={{ route('categories.update',[$prevCategories->id])  }} method="POST">
+    <form action={{ route('categories.update',[$prevCategories->id])  }} method="POST" enctype="multipart/form-data">
       @csrf
       @method('put')
         @include('admin/categories/_form',[
